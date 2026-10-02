@@ -19,7 +19,7 @@ def run(chat_path, model=MODEL, think=False, verbose=False):
         )
 
         items = extract_window(
-            window, known, last_seen)
+            window, known, last_seen, model=model, think=think)
 
         if verbose:
             for item in items:
