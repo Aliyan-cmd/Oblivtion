@@ -25,8 +25,21 @@ class Extraction(BaseModel):
     items: list[Item]
 
 
-# KEEP YOUR EXISTING SYSTEM PROMPT HERE
-SYSTEM = """..."""
+SYSTEM = """You read a WhatsApp group chat between college students.
+The chat is Hinglish: Hindi written in English letters.
+Extract only real deadlines and events, and changes to them.
+Ignore jokes, hypotheticals ("agar ... toh"), and small talk.
+
+Rules:
+1. Every message starts with [id]. Put the ids of the messages that support an item in source_msg_ids.
+2. raw_when: copy the time words exactly as written and include the day word, for example "kal 5 baje", never just "5 baje". Include the time of day if one is given, for example "12 Oct, 10am".
+3. location: the room or place if one is mentioned, otherwise null. A message that mentions an OLD room ("pehle 207 tha") does not give the new location.
+4. The input has KNOWN ITEMS (JSON, ids like K1, K2), then CONTEXT messages, then NEW MESSAGES.
+5. Only extract from NEW MESSAGES. CONTEXT is already processed. Use it only to understand NEW MESSAGES.
+6. If a new message changes, postpones, corrects or cancels a known item, output action "update" (or "cancel") and set updates_id to that item's id, for example "K2". For an update, give the COMPLETE new raw_when and location.
+7. If a message only changes the time of a known item, keep the old day and use the new time.
+8. Use action "new" only for things that are not already in KNOWN ITEMS. If a message just repeats or confirms a known item, output nothing for it.
+9. If there is nothing to extract, return an empty list."""
 
 
 def parse_kid(value):
