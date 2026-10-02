@@ -35,7 +35,7 @@ def parse_kid(value):
     return None
 
 
-def extract_window(window, known, last_seen_id=-1):
+def extract_window(window, known, last_seen_id=-1, model=MODEL, think=False):
     # Separate old messages from new messages
     context = []
     new = []
@@ -72,7 +72,8 @@ NEW MESSAGES:
 
     # Ask Gemma
     response = ollama.chat(
-        model=MODEL,
+        model=model,
+        think=think,
         messages=[
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": prompt},
@@ -99,14 +100,28 @@ NEW MESSAGES:
     ]
 
 
+def _pick_anchor(day_msg_id, source_ids):
+    """Anchor must be one of the item's own source messages, else use the latest."""
+    if day_msg_id in source_ids:
+        return day_msg_id
+    return max(source_ids) if source_ids else day_msg_id
+
+
 def apply(known, items, next_id):
-
     for item in items:
-
         target = parse_kid(item.updates_id)
+        action = item.action
 
-        # NEW
-        if item.action == "new":
+        # An update pointing at an id we don't have is really a new item.
+        if action == "update" and target not in known:
+            action = "new"
+
+        if action == "new":
+            sources = list(dict.fromkeys(item.source_msg_ids))
+            anchor = item.day_msg_id
+            if item.day is not None:
+                anchor = _pick_anchor(anchor, sources)
+
             known[next_id] = {
                 "id": next_id,
                 "status": "active",
@@ -115,22 +130,18 @@ def apply(known, items, next_id):
                 "location": item.location,
                 "day": item.day,
                 "time": item.time,
-                "day_msg_id": item.day_msg_id,
-                "source_msg_ids": item.source_msg_ids,
+                "day_msg_id": anchor,
+                "source_msg_ids": sources,
             }
-
             next_id += 1
 
-        # UPDATE
-        elif item.action == "update":
-            if target not in known:
-                continue
-
+        elif action == "update":
             old = known[target]
+            sources = list(dict.fromkeys(item.source_msg_ids))
 
             if item.day is not None:
                 old["day"] = item.day
-                old["day_msg_id"] = item.day_msg_id
+                old["day_msg_id"] = _pick_anchor(item.day_msg_id, sources)
 
             if item.time is not None:
                 old["time"] = item.time
@@ -138,10 +149,12 @@ def apply(known, items, next_id):
             if item.location is not None:
                 old["location"] = item.location
 
-            old["source_msg_ids"] += item.source_msg_ids
+            # order-preserving merge, no duplicates, new list (no aliasing)
+            old["source_msg_ids"] = list(
+                dict.fromkeys(old["source_msg_ids"] + sources)
+            )
 
-        # CANCEL
-        elif item.action == "cancel":
+        elif action == "cancel":
             if target in known:
                 known[target]["status"] = "cancelled"
 
