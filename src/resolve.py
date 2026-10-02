@@ -27,12 +27,41 @@ RELATIVE_DAYS = {
     "tomorrow": 1,
     "tmrw": 1,
     "tmr": 1,
+    "2moro": 1,
+    "2mrw": 1,
+    "2morrow": 1,
     "parso": 2
 }
 
 
+FULL_MONTHS = {
+    "january": 1, "february": 2, "march": 3, "april": 4,
+    "june": 6, "july": 7, "august": 8, "september": 9,
+    "october": 10, "november": 11, "december": 12,
+    "sept": 9,
+}
+
+MONTH_WORDS = set(MONTHS) | set(FULL_MONTHS)
+
+
 def get_month(name):
-    return MONTHS.get(name[:3])
+    # exact words only, so "market" doesn't become March
+    return MONTHS.get(name) or FULL_MONTHS.get(name)
+
+
+def find_date(text):
+    """Return (day, month) for '2 Oct' / 'Oct 2nd' / '12th October', else None."""
+    for m in re.finditer(r"\b(\d{1,2})(?:st|nd|rd|th)?\s*([a-z]{3,9})\b", text):
+        month = get_month(m.group(2))
+        if month:
+            return int(m.group(1)), month
+
+    for m in re.finditer(r"\b([a-z]{3,9})\s*(\d{1,2})(?:st|nd|rd|th)?\b", text):
+        month = get_month(m.group(1))
+        if month:
+            return int(m.group(2)), month
+
+    return None
 
 
 def resolve_day(text, anchor):
@@ -40,33 +69,12 @@ def resolve_day(text, anchor):
         return None
 
     text = text.lower()
+    words = re.findall(r"[a-z0-9]+", text)
 
-    # Example: "2 Oct"
-    match = re.search(
-        r"\b(\d{1,2})(?:st|nd|rd|th)?\s*([a-z]{3,9})\b",
-        text
-    )
-
-    # Example: "Oct 2"
-    if not match:
-        match = re.search(
-            r"\b([a-z]{3,9})\s*(\d{1,2})\b",
-            text
-        )
-
-        if match:
-            day = int(match.group(2))
-            month = get_month(match.group(1))
-        else:
-            day = None
-            month = None
-
-    else:
-        day = int(match.group(1))
-        month = get_month(match.group(2))
-
-    # We found an actual date
-    if day and month:
+    # Example: "2 Oct", "Oct 2nd"
+    found = find_date(text)
+    if found:
+        day, month = found
         try:
             result = date(anchor.year, month, day)
 
@@ -75,22 +83,18 @@ def resolve_day(text, anchor):
                 result = date(anchor.year + 1, month, day)
 
             return result
-
         except ValueError:
             return None
 
-    # Example: "kal", "tomorrow", "parso"
-    for word in text.split():
+    # Example: "kal", "tomorrow", "2moro"
+    for word in words:
         if word in RELATIVE_DAYS:
             return anchor + timedelta(days=RELATIVE_DAYS[word])
 
     # Example: "Friday"
-    for word in text.split():
+    for word in words:
         if word in WEEKDAYS:
-            days_ahead = (
-                WEEKDAYS[word] - anchor.weekday()
-            ) % 7
-
+            days_ahead = (WEEKDAYS[word] - anchor.weekday()) % 7
             return anchor + timedelta(days=days_ahead)
 
     return None
@@ -101,6 +105,11 @@ def resolve_time(text):
         return None
 
     text = text.lower()
+
+    # A date in the time field ("1 Oct") is not a clock time
+    has_clock = re.search(r"\d\s*(am|pm)\b|\d:\d\d", text)
+    if find_date(text) and not has_clock:
+        return None
 
     # Find something like 2, 10, 10:30
     match = re.search(r"(\d{1,2})(?::(\d{2}))?", text)
@@ -115,10 +124,10 @@ def resolve_time(text):
         return None
 
     # Explicit AM/PM
-    if "am" in text:
+    if re.search(r"(?<![a-z])am(?![a-z])", text):
         hour = hour % 12
 
-    elif "pm" in text:
+    elif re.search(r"(?<![a-z])pm(?![a-z])", text):
         hour = hour % 12 + 12
 
     # Hindi time-of-day words
