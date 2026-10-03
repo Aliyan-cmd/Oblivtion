@@ -7,8 +7,9 @@ Group chats bury the one real deadline under hundreds of messages, memes and
 deadlines, events and changes of plan, and gives you a clean summary plus a
 calendar file you can import.
 
-It runs **entirely on your machine** (Ollama + an open model(gemma4:e4b was used during development)). The chats it was built for are group chats of friends, so nothing is ever sent to a cloud API.
-It handles **Hinglish (Hindi words written in English)**: "kal 5 baje", "parso", "ab Friday tak hai".
+It runs **entirely on your machine** (Ollama + an open model). The chats it was
+built for are group chats of friends, so nothing is ever sent to a cloud API.
+It handles **Hinglish**: "kal 5 baje", "parso", "ab Friday tak hai".
 
 Built for the DEV Hacktoberfest 2026 Weekend Challenge, *Build for a Friend*.
 
@@ -29,7 +30,7 @@ Output (`out/tldr.md`):
 
 ```markdown
 ## Fri 02 Oct
-- 13:30 · DBMS assignment 2 deadline — due · msgs 3, 22, 35, 37, 50
+- **13:30** · DBMS assignment 2 deadline — due · msgs 3, 22, 35, 37, 50
 ```
 
 One card with its history and the messages it came from, instead of four
@@ -99,22 +100,21 @@ Setup: `gemma4:e4b` via Ollama, temperature 0, seed 0, frozen prompt "v2", the
 53-message sample chat, **7 gold items**. Because the gold set is tiny, one item
 is worth 14 percentage points, so counts are shown.
 
-
-
 | mode | items found | precision | date correct | time correct | time / run |
 |---|---|---|---|---|---|
-| thinking off | 5 / 7 | 100% | 57% | 57% | ~44 s (5 identical runs) |
-| thinking on | 7 / 7 | 78% | 71% (range 43-86%) | 71% (range 29-86%) | ~273 s |
+| thinking off | 5 / 7 | 100% | 57% | 57% | ~58 s median, 47-69 s (9 identical runs) |
+| thinking on | 7 / 7 | 78% | 71% | 71% | ~354 s median, 350-358 s (3 identical runs) |
 
 What this shows:
 
 - **Thinking off is fast and deterministic, but misses things.** It misses the
   study session and the makeup class (it copies the DBMS paper's title onto the
   makeup-class messages).
-- **Thinking on finds everything but costs ~6x the time**, adds spurious items
-  (lower precision), and its dates vary between runs.
+- **Thinking on finds everything but costs ~6x the time** and adds spurious items
+  (lower precision). In an earlier 5-run test its date accuracy varied between
+  43% and 86%; the 3 frozen runs were identical, so its stability is unproven.
 - **Seed matters.** An unseeded single run once scored 6/7 with 86% on every
-  metric. With the seed pinned, the same setup is stable at 5/7. A single
+  metric. With the seed pinned, the same setup gave 5/7 in all 9 runs. A single
   unseeded run is not evidence, so report medians and ranges.
 
 ### What didn't help
@@ -130,6 +130,22 @@ Prompt and input changes tried after the v2 baseline, measured the same way:
 The sample chat was also the development set for the prompt, so these numbers
 are optimistic for unseen chats.
 
+### Real-chat spot check (qualitative)
+
+The tool was also run on a real 1,178-message group chat (61 windows). That chat
+is not published and has no gold labels yet, so this is an observation, not a
+score. One-off events with explicit dates were extracted well. Failure modes:
+
+- **Recurring items with generic titles** ("Assignment submission", "Test") were
+  merged across months into a single card, because the matcher has no notion of
+  time.
+- **Numeric dates** (`01.12.2025`, `31|03|2026`) and bare ordinals ("20th") are
+  not parsed, so about half of the extracted items land in the "date unclear"
+  section.
+- **Devanagari** month names and times are not parsed.
+- The summary omits the year, which hid at least one wrong-year date.
+
+These are the planned next steps for v0.2.
 
 ## Limitations
 
