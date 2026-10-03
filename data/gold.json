@@ -1,9 +1,9 @@
 [
   {"title": "DBMS assignment 2", "date": "2026-10-02", "time": "13:30", "location": null},
   {"title": "Lab", "date": "2026-10-01", "time": "14:00", "location": "Room 304"},
-  {"title": "Library meetup", "date": "2026-10-01", "time": "17:00", "location": "library"},
   {"title": "DBMS paper", "date": "2026-10-12", "time": "10:00", "location": null},
   {"title": "OS paper", "date": "2026-10-14", "time": "10:00", "location": null},
   {"title": "Makeup class", "date": "2026-10-03", "time": "11:30", "location": "Room 112"},
-  {"title": "DBMS lab record", "date": "2026-10-05", "time": null, "location": "cabin"}
+  {"title": "DBMS lab record", "date": "2026-10-05", "time": null, "location": "cabin"},
+  {"title": "Library meetup", "aliases": ["Study session"], "date": "2026-10-01", "time": "17:00"}
 ]

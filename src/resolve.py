@@ -160,9 +160,13 @@ def resolve_item(item, messages):
         message = messages.get(last_id)
 
     # Resolve the day
-    if message and item.get("day"):
+        # Small models sometimes put "kal 5 baje" in `time` and leave `day` empty,
+    # so fall back to the time text.
+    day_text = item.get("day") or item.get("time")
+
+    if message and day_text:
         day = resolve_day(
-            item["day"],
+            day_text,
             message.ts.date()
         )
 
