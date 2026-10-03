@@ -5,6 +5,8 @@ from typing import Literal
 import ollama
 from pydantic import BaseModel
 
+from src.match import match_known
+
 
 MODEL = "gemma4:e4b"
 
@@ -40,7 +42,6 @@ Rules:
 7. If a message only changes the time of a known item, keep the old day and use the new time.
 8. Use action "new" only for things that are not already in KNOWN ITEMS. If a message just repeats or confirms a known item, output nothing for it.
 9. If there is nothing to extract, return an empty list."""
-
 
 def parse_kid(value):
     if value and re.fullmatch(r"K\d+", value):
@@ -123,14 +124,19 @@ def _pick_anchor(day_msg_id, source_ids):
 def apply(known, items, next_id):
     for item in items:
         target = parse_kid(item.updates_id)
-        action = item.action
 
-        # An update pointing at an id we don't have is really a new item.
-        if action == "update" and target not in known:
-            action = "new"
+        # cancels trust a valid id (nothing else to go on)
+        if item.action == "cancel":
+            if target in known:
+                known[target]["status"] = "cancelled"
+            continue
 
-        if action == "new":
-            sources = list(dict.fromkeys(item.source_msg_ids))
+        sources = list(dict.fromkeys(item.source_msg_ids))
+
+        # "new" or "update" - we decide ourselves whether it's something we know
+        hit = match_known(item.title, sources, known, hint=target)
+
+        if hit is None:
             anchor = item.day_msg_id
             if item.day is not None:
                 anchor = _pick_anchor(anchor, sources)
@@ -147,28 +153,22 @@ def apply(known, items, next_id):
                 "source_msg_ids": sources,
             }
             next_id += 1
+            continue
 
-        elif action == "update":
-            old = known[target]
-            sources = list(dict.fromkeys(item.source_msg_ids))
+        old = known[hit]
 
-            if item.day is not None:
-                old["day"] = item.day
-                old["day_msg_id"] = _pick_anchor(item.day_msg_id, sources)
+        if item.day is not None:
+            old["day"] = item.day
+            old["day_msg_id"] = _pick_anchor(item.day_msg_id, sources)
 
-            if item.time is not None:
-                old["time"] = item.time
+        if item.time is not None:
+            old["time"] = item.time
 
-            if item.location is not None:
-                old["location"] = item.location
+        if item.location is not None:
+            old["location"] = item.location
 
-            # order-preserving merge, no duplicates, new list (no aliasing)
-            old["source_msg_ids"] = list(
-                dict.fromkeys(old["source_msg_ids"] + sources)
-            )
-
-        elif action == "cancel":
-            if target in known:
-                known[target]["status"] = "cancelled"
+        old["source_msg_ids"] = list(
+            dict.fromkeys(old["source_msg_ids"] + sources)
+        )
 
     return next_id
