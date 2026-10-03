@@ -96,6 +96,7 @@ NEW MESSAGES:
         options={
             "temperature": 0,
             "num_ctx": 8192,
+            "seed": 0,
         },
     )
 
