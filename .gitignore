@@ -5,3 +5,11 @@ out/
 runs/
 data/real*data/real_*
 data/real_*
+
+# web app
+node_modules/
+.next/
+.vercel/
+.env
+.env*.local
+*.tsbuildinfo

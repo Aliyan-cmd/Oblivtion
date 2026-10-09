@@ -56,6 +56,42 @@ Writes `out/tldr.md`, `out/tldr.ics` and `out/state.json`.
 To use your own chat: in WhatsApp, open the chat, **Export chat -> Without
 media**, put the `.txt` in `data/`, and point the CLI at it.
 
+## Web app (Groq + Vercel)
+
+There is a browser UI in this repo (Next.js, App Router) that runs the same
+pipeline in a serverless function, but calls **Groq** instead of Ollama, so it
+can be deployed to Vercel. The pipeline is ported 1:1 to TypeScript in `lib/`
+(`parse`, `window`, `extract`, `match`, `resolve`, `render`, `redact`); the UI
+lives in `app/page.tsx` and the API route in `app/api/analyze/route.ts`.
+
+```bash
+npm install
+cp .env.example .env        # then add your key
+npm run dev                 # http://localhost:3000
+```
+
+Add your key to `.env`:
+
+```
+GROQ_API_KEY=gsk_...
+```
+
+Get a free key at <https://console.groq.com/keys>. You can also paste a key
+directly in the UI (it is only sent to this app's own API route for that
+request, never stored).
+
+### Deploy on Vercel
+
+1. Push this repo to GitHub.
+2. In Vercel, **Add New -> Project** and import the repo. It is auto-detected as
+   Next.js, so no build settings are needed.
+3. Add an environment variable `GROQ_API_KEY` (Production, Preview and
+   Development).
+4. Deploy.
+
+The API route streams per-window progress (NDJSON) so the UI shows which part of
+the chat is being read. Default model: `llama-3.3-70b-versatile`.
+
 ## How it works
 
 ```
@@ -184,6 +220,10 @@ src/
 eval/           score_gold.py, repeat.py, results.csv
 tests/          unit tests (no Ollama needed)
 data/           sample_chat.txt, gold.json
+
+app/            Next.js web UI + /api/analyze route
+lib/            TypeScript port of the pipeline (Groq backend)
+public/         sample_chat.txt served to the UI
 ```
 
 ## Tests
