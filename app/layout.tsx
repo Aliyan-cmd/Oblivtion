@@ -2,19 +2,22 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Obliivon — turn your group chat into deadlines",
+  title: "Oblivion — Ephemeral Knowledge Graph",
   description:
-    "Reads a WhatsApp group chat, extracts only the deadlines and events, and gives you a summary plus a calendar file. Hinglish aware, powered by Groq.",
+    "Transform overwhelming chat exports into a minimal Attention Ledger showing only active obligations and pending questions. Zero-knowledge, local-first.",
+  keywords: ["chat", "productivity", "AI", "privacy", "local-first"],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0a0a0b",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#080b14] font-sans antialiased">
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans antialiased">
         {children}
       </body>
     </html>

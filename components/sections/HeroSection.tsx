@@ -26,7 +26,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onExploreHub,
 }) => {
   return (
-    <section className="relative py-8 md:py-12">
+    <section className="relative py-12 bg-gradient-to-b from-gray-50 to-gray-100 text-gray-900">
       <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
         {/* Left Column Text Content */}
         <motion.div
@@ -36,38 +36,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           className="lg:col-span-7"
         >
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-neutral-500/30 bg-gradient-to-r from-neutral-500/10 via-zinc-500/10 to-neutral-200/10 px-3.5 py-1.5 backdrop-blur-md">
-            <Sparkles className="h-4 w-4 text-neutral-300 animate-pulse" />
-            <span className="text-xs font-semibold text-neutral-200">
+          <div className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 px-3.5 py-1.5">
+            <Sparkles className="h-4 w-4 text-gray-600 animate-pulse" />
+            <span className="text-xs font-semibold text-gray-700">
               Powered by Groq LLMs &amp; Hinglish Intelligence
             </span>
           </div>
 
           {/* Main Title */}
-          <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-[1.15]">
-            Your group chat,{" "}
-            <span className="bg-gradient-to-r from-neutral-400 via-zinc-400 to-neutral-300 bg-clip-text text-transparent">
+          <h1 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl leading-[1.15] text-gray-900">
+            Your group chat, <span className="bg-gradient-to-r from-gray-500 via-gray-600 to-gray-700 bg-clip-text text-transparent">
               minus the chaos.
             </span>
           </h1>
 
-          <p className="mt-4 text-base sm:text-lg text-neutral-300 leading-relaxed">
-            Paste a WhatsApp export containing informal Hinglish updates (&quot;kal lab 2 baje postpone hua&quot;).
-            <span className="font-semibold text-white"> Obliivon</span> automatically extracts deadlines, resolves relative timestamps (&quot;kal&quot; &rarr; 2 Oct), deduplicates updates into single event cards, and generates standard <span className="text-neutral-400 font-mono text-xs">.ics</span> calendar downloads.
+          <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed">
+            Paste a WhatsApp export containing informal Hinglish updates ("kal lab 2 baje postpone hua").
+            <span className="font-semibold text-gray-800"> Obliivon</span> automatically extracts deadlines, resolves relative timestamps ("kal" → 2 Oct), deduplicates updates into single event cards, and generates standard <span className="text-gray-500 font-mono text-xs">.ics</span> calendar downloads.
           </p>
 
           {/* Quick Feature Pills */}
-          <div className="mt-6 flex flex-wrap gap-4 text-xs font-medium text-neutral-400">
+          <div className="mt-6 flex flex-wrap gap-4 text-xs font-medium text-gray-500">
             <div className="flex items-center gap-1.5">
-              <CheckCircle className="h-4 w-4 text-neutral-300" />
+              <CheckCircle className="h-4 w-4 text-gray-600" />
               <span>Hinglish &amp; Slang Aware</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Zap className="h-4 w-4 text-neutral-400" />
+              <Zap className="h-4 w-4 text-gray-600" />
               <span>Windowed Streamed Extraction</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Shield className="h-4 w-4 text-zinc-400" />
+              <Shield className="h-4 w-4 text-gray-600" />
               <span>Zero Data Persistence</span>
             </div>
           </div>
@@ -77,6 +76,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <Button
               variant="primary"
               size="lg"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
               icon={<ArrowRight className="h-4 w-4" />}
               onClick={onStartAnalyzing}
             >
@@ -87,7 +87,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               size="lg"
               onClick={onExploreHub}
             >
-              Explore Navigation &amp; Resources Hub
+              Explore Resources Hub
             </Button>
           </div>
         </motion.div>

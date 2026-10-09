@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import type { AnalyzePayload } from "@/lib/serialize";
 import { useConfetti } from "./useConfetti";
+
 
 export type ApiKeyInfo = { name: string; key: string };
 
@@ -94,7 +94,7 @@ export function useChatAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<ProgressState | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<AnalyzePayload | null>(null);
+  const [result, setResult] = useState<unknown>(null);
 
   const { fireConfetti } = useConfetti();
   const fileRef = useRef<HTMLInputElement>(null);

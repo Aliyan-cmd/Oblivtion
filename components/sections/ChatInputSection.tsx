@@ -68,7 +68,7 @@ export const ChatInputSection: React.FC<ChatInputSectionProps> = ({
 }) => {
   return (
     <section id="chat-analyzer-input" className="h-fit">
-      <Card glow className="border-neutral-500/20 bg-neutral-900/90 shadow-2xl">
+      <Card glow className="border-gray-200 bg-white shadow-lg">
         {/* Header toolbar */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
           <div className="flex items-center gap-2">
@@ -122,7 +122,7 @@ export const ChatInputSection: React.FC<ChatInputSectionProps> = ({
             onChange={(e) => setChat(e.target.value)}
             spellCheck={false}
             placeholder={`[3] Aditi: DBMS assignment 2 ka deadline Thursday hai, 1 Oct\n[22] Aditi: Update: deadline postpone ho gaya, ab Friday 2 Oct tak hai\n[35] Aditi: kal 2 baje PM tak submit karna hai portal pe`}
-            className="h-64 w-full resize-y rounded-xl border border-white/10 bg-neutral-950/80 p-4 font-mono text-xs leading-relaxed text-neutral-100 outline-none transition focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/20 placeholder:text-neutral-600 shadow-inner"
+            className="h-64 w-full resize-y rounded-xl border border-gray-300 bg-white p-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
           />
           <div className="mt-2 flex items-center justify-between text-[11px] text-neutral-400">
             <span className="flex items-center gap-1 text-neutral-500">
