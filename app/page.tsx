@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from
 import {
   Upload, FileText, Clock, AlertCircle, HelpCircle,
   CheckCircle, Ghost, Zap, Lock, ChevronDown, X, Search,
-  Key, Trash2, Eye, EyeOff, Shield, Activity
+  Key, Trash2, Eye, EyeOff, Shield, Activity, Code, BookOpen
 } from "lucide-react";
 import type { AttentionLedger, ObligationCard, ParseProgress, AppPhase } from "@/lib/types";
 import { parseChat } from "@/lib/parser";
@@ -1067,15 +1067,15 @@ export default function OblivionPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "var(--bg)" }}>
+    <div className="min-h-screen flex flex-col overflow-x-hidden" style={{ background: "var(--bg)" }}>
       {/* Particle dissolution overlay */}
       <GhostingCanvas ref={ghostingCanvasRef} />
 
       {/* Top nav */}
       <motion.header
-        initial={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={VIBRANT_SPRING}
+        transition={{ delay: 0.2, ...VIBRANT_SPRING }}
         className="flex items-center justify-between px-6 py-4 border-b"
         style={{
           borderColor: "var(--border)",
@@ -1097,14 +1097,60 @@ export default function OblivionPage() {
             v0.2
           </span>
         </div>
-        <div className="flex items-center gap-3 text-[11px] text-[var(--text-3)]">
-          <EncryptionBreather />
-          <span>Client-side only · No data sent</span>
+
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-3 text-[11px] text-[var(--text-3)]">
+            <EncryptionBreather />
+            <span>Client-side only · No data sent</span>
+          </div>
+
+          <div className="h-4 w-px bg-[var(--border)] mx-1 hidden sm:block"></div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
+            <motion.a
+              href="https://github.com/Aliyan-cmd/Oblivtion"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05, y: -1 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium text-[var(--text)] transition-all hover:bg-white/5"
+              style={{ border: "1px solid var(--border)", background: "rgba(255,255,255,0.03)" }}
+            >
+              <Code size={13} aria-hidden="true" />
+              <span className="hidden sm:inline">Repo</span>
+            </motion.a>
+            <motion.a
+              href="#"
+              whileHover={{ scale: 1.05, y: -1 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium text-[var(--bg)] bg-[var(--text)] transition-all hover:opacity-90"
+            >
+              <BookOpen size={13} aria-hidden="true" />
+              <span>Docs</span>
+            </motion.a>
+          </div>
         </div>
       </motion.header>
 
       {/* Main content */}
-      <main id="main-content" className="flex-1 flex flex-col items-center justify-center px-6 py-12 gap-12">
+      <motion.main
+        id="main-content"
+        className="flex-1 flex flex-col items-center justify-center px-6 py-12 gap-12 relative"
+        initial={{ opacity: 0, scale: 0.98, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: VIBRANT_EASE as any }}
+      >
+        {/* Subtle background glow effect */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 1 }}
+          style={{
+            background: "radial-gradient(circle at 50% 30%, rgba(68, 136, 255, 0.04) 0%, transparent 60%)",
+          }}
+        />
         <AnimatePresence mode="wait">
           {phase === "IDLE" && (
             <motion.div
@@ -1166,7 +1212,7 @@ export default function OblivionPage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
+      </motion.main>
 
       {/* Footer */}
       <footer
